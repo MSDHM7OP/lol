@@ -64,8 +64,8 @@ const RealtimeVoice = ({ onAddMessage, theme }) => {
       setIsConnecting(true);
       setStatus("Connecting...");
 
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
-      const tokenRes = await fetch(`${backendUrl}/api/student/realtime-session`, {
+      // Call Vercel serverless function (proxies to backend)
+      const tokenRes = await fetch('/api/student/realtime-session', {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" }
@@ -346,8 +346,9 @@ const StudentDashboard = () => {
   }, [messages]);
 
   // ⚠️ SECURITY: Never expose API keys to frontend
-  // All API calls should go through backend proxy endpoints
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "http://localhost:5000";
+  // All API calls go through Vercel serverless functions (/api routes)
+  // which proxy to your backend service
+  const API_ENDPOINT = '/api/ai/chat';
 
   const getWellnessResponse = msg => {
     msg = msg.toLowerCase();
@@ -362,8 +363,8 @@ const StudentDashboard = () => {
     try {
       setBotIsTyping(true);
       
-      // Call backend proxy instead of direct OpenAI API
-      const res = await fetch(`${BACKEND_URL}/api/ai/chat`, {
+      // Call Vercel serverless function (proxies to backend)
+      const res = await fetch(API_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -462,8 +463,8 @@ const StudentDashboard = () => {
       const form = new FormData();
       form.append("file", blob, "audio.webm");
 
-      // ⚠️ SECURITY: Call backend proxy instead of direct OpenAI API
-      const res = await fetch(`${BACKEND_URL}/api/ai/transcribe`, {
+      // ⚠️ SECURITY: Call Vercel serverless function (proxies to backend)
+      const res = await fetch('/api/ai/transcribe', {
         method: "POST",
         credentials: "include",
         body: form
